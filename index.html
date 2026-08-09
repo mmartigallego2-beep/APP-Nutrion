@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#155e55" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <title>MacroPlan Local</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">M</span><div><strong>MacroPlan</strong><small>Nutrición sencilla</small></div></div>
+    <button class="icon-button" id="settingsButton" aria-label="Abrir objetivos">⚙</button>
+  </header>
+
+  <main>
+    <section class="view active" id="todayView">
+      <div class="page-heading"><div><p class="eyebrow">RESUMEN DIARIO</p><h1>Hoy</h1><p id="todayDate"></p></div><input id="activeDate" type="date" aria-label="Fecha del diario" /></div>
+      <div class="hero-card">
+        <div class="calorie-ring" id="calorieRing"><div><strong id="remainingKcal">0</strong><span>kcal restantes</span></div></div>
+        <div class="calorie-summary"><p><span>Objetivo</span><strong id="goalKcal">0</strong></p><p><span>Consumidas</span><strong id="usedKcal">0</strong></p></div>
+      </div>
+      <div class="macro-grid" id="macroCards"></div>
+      <div class="section-title"><div><p class="eyebrow">REGISTRO</p><h2>Comidas del día</h2></div><button class="primary" id="quickAdd">＋ Añadir alimento</button></div>
+      <div id="mealList" class="meal-list"></div>
+    </section>
+
+    <section class="view" id="plannerView">
+      <div class="page-heading"><div><p class="eyebrow">ORGANIZA TU SEMANA</p><h1>Plan semanal</h1><p>Los días pasados muestran lo que realmente registraste; hoy y los próximos días muestran tu planificación.</p></div><button class="secondary" id="clearPlan">Limpiar planificación</button></div>
+      <div class="week-grid" id="weekGrid"></div>
+    </section>
+
+    <section class="view" id="foodsView">
+      <div class="page-heading"><div><p class="eyebrow">BASE DE ALIMENTOS</p><h1>Buscar alimentos</h1><p>Busca productos españoles o crea los tuyos.</p></div><button class="primary" id="customFoodButton">＋ Crear alimento</button></div>
+      <form class="search-bar" id="searchForm"><select id="searchScope" aria-label="Dónde buscar"><option value="mine">Mis alimentos habituales</option><option value="online">Productos online</option></select><input id="searchInput" placeholder="Ej. leche Hacendado, arroz, yogur…" autocomplete="off" /><button class="primary" type="submit">Buscar</button></form>
+      <p class="source-note">Los productos online proceden de OpenFoodFacts y pueden contener datos incompletos. Revisa siempre la etiqueta.</p>
+      <div id="searchStatus" class="empty-state">Busca por nombre o marca. También verás aquí tus alimentos personalizados.</div>
+      <div id="foodResults" class="food-results"></div>
+    </section>
+
+    <section class="view" id="settingsView">
+      <div class="page-heading"><div><p class="eyebrow">TU PLAN</p><h1>Objetivos diarios</h1><p>Puedes modificarlos cuando quieras.</p></div></div>
+      <form class="settings-card" id="goalsForm">
+        <label>Calorías (kcal)<input name="kcal" type="number" min="500" max="10000" required /></label>
+        <label>Proteínas (g)<input name="protein" type="number" min="0" max="1000" required /></label>
+        <label>Carbohidratos (g)<input name="carbs" type="number" min="0" max="1500" required /></label>
+        <label>Grasas (g)<input name="fat" type="number" min="0" max="1000" required /></label>
+        <button class="primary wide" type="submit">Guardar objetivos</button>
+      </form>
+      <div class="danger-zone"><div><strong>Datos locales</strong><p>La información solo se guarda en este navegador.</p></div><button class="danger" id="resetData" type="button">Borrar todos mis datos</button></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <button data-view="todayView" class="active"><span>◉</span>Mi día</button>
+    <button data-view="plannerView"><span>▦</span>Plan</button>
+    <button data-view="foodsView"><span>⌕</span>Alimentos</button>
+    <button data-view="settingsView"><span>⚙</span>Objetivos</button>
+  </nav>
+
+  <dialog id="foodDialog">
+    <form id="foodEntryForm" method="dialog" class="dialog-card">
+      <button type="button" class="dialog-close" data-close="foodDialog">×</button>
+      <p class="eyebrow">AÑADIR AL DIARIO</p><h2 id="entryFoodName">Alimento</h2><p id="entryFoodInfo" class="muted"></p>
+      <label>Comida<select name="meal"><option>Desayuno</option><option>Comida</option><option>Merienda</option><option>Cena</option><option>Otros</option></select></label>
+      <div class="segmented"><button type="button" data-mode="grams" class="active">Gramos exactos</button><button type="button" data-mode="portion">Porción visual</button></div>
+      <div id="gramsMode"><label>Cantidad en gramos<input name="grams" type="number" min="0.1" step="0.1" value="100" /></label></div>
+      <div id="portionMode" hidden><label>Porción<select name="portion"></select></label><label>Número de porciones<input name="portionCount" type="number" min="0.25" step="0.25" value="1" /></label></div>
+      <div class="nutrition-preview" id="nutritionPreview"></div>
+      <button class="primary wide" type="submit">Añadir al diario</button>
+    </form>
+  </dialog>
+
+  <dialog id="customFoodDialog">
+    <form id="customFoodForm" method="dialog" class="dialog-card">
+      <button type="button" class="dialog-close" data-close="customFoodDialog">×</button>
+      <p class="eyebrow">ALIMENTO PERSONALIZADO</p><h2>Crear alimento</h2><p class="muted">Introduce los valores que figuran en la etiqueta por cada 100 g.</p>
+      <label>Nombre<input name="name" required maxlength="80" /></label><label>Marca (opcional)<input name="brand" maxlength="60" /></label>
+      <div class="two-cols"><label>Calorías<input name="kcal" type="number" min="0" step="0.1" required /></label><label>Proteínas (g)<input name="protein" type="number" min="0" step="0.1" required /></label><label>Carbohidratos (g)<input name="carbs" type="number" min="0" step="0.1" required /></label><label>Grasas (g)<input name="fat" type="number" min="0" step="0.1" required /></label></div>
+      <label>Nombre de porción (opcional)<input name="portionName" placeholder="Ej. 1 unidad" /></label><label>Gramos de esa porción<input name="portionGrams" type="number" min="0.1" step="0.1" placeholder="Ej. 125" /></label>
+      <button class="primary wide" type="submit">Guardar alimento</button>
+    </form>
+  </dialog>
+  <div id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
